@@ -63,6 +63,7 @@ topology:
       mgmt-ipv4: 192.168.121.101
       kind: linux
       image: oxidized/oxidized:latest
+      startup-delay: 10
       binds:
       # Map SR Linux Ruby source into container for latest updates
       - ../lib/oxidized/model/srlinux.rb:/var/lib/gems/3.0.0/gems/oxidized-0.29.1/lib/oxidized/model/srlinux.rb

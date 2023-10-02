@@ -24,7 +24,7 @@ crash:
 stats:
   history_size: 10
 input:
-  default: ssh, telnet
+  default: ssh # ,telnet
   debug: true
   ssh:
     secure: false
