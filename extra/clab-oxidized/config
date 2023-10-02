@@ -1,0 +1,53 @@
+---
+username: username
+password: password
+model: srlinux
+resolve_dns: true
+interval: 3600
+use_syslog: false
+debug: true
+threads: 30
+use_max_threads: false
+timeout: 20
+retries: 3
+prompt: !ruby/regexp /^([\w.@-]+[#>]\s?)$/
+rest: 0.0.0.0:8888
+next_adds_job: false
+vars: {}
+groups: {}
+group_map: {}
+models: {}
+pid: "/home/oxidized/.config/oxidized/pid"
+crash:
+  directory: "/home/oxidized/.config/oxidized/crashes"
+  hostnames: false
+stats:
+  history_size: 10
+input:
+  default: ssh, telnet
+  debug: true
+  ssh:
+    secure: false
+  ftp:
+    passive: true
+  utf8_encoded: true
+output:
+  default: file
+  file:
+    directory: "/home/oxidized/.config/oxidized/configs"
+source:
+  default: csv
+  csv:
+    file: "/home/oxidized/.config/oxidized/router.db"
+    delimiter: !ruby/regexp /:/
+    map:
+      name: 0
+      ip: 1
+      model: 2
+      username: 3
+      password: 4
+    gpg: false
+model_map:
+  juniper: junos
+  cisco: ios
+  nokia: srlinux

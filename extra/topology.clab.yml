@@ -1,0 +1,71 @@
+# Copyright 2023 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
+# Sample Containerlab topology to demonstrate the use of Oxidized with a SR Linux device
+#
+# To use: sudo containerlab deploy --reconfigure
+#
+# The web interface is then available at http://192.168.121.101:8888/
+
+name: Oxidized
+
+mgmt:
+  network: oxd_mgmt
+  ipv4-subnet: 192.168.121.0/24
+
+topology:
+  nodes:
+
+    srlinux:
+      mgmt-ipv4: 192.168.121.123
+      kind: nokia_srlinux
+      type: ixrd2l
+      image: ghcr.io/nokia/srlinux:${SRLINUX_VERSION:=latest}
+
+      # Small sample config, could be anything
+      startup-config: |
+        /routing-policy policy accept-all default-action policy-result accept
+        /interface ethernet-1/1
+        admin-state enable
+        subinterface 0 {
+         ipv4 {
+            admin-state enable
+            address ${IP2:=80.249.208.126}/22 primary
+        /network-instance default
+        type default
+        admin-state enable
+        interface ethernet-1/1.0 { }
+        protocols {
+         bgp {
+            autonomous-system ${AS2:=24875}
+            router-id 10.0.0.2
+            ebgp-default-policy export-reject-all false import-reject-all false
+            export-policy accept-all
+            afi-safi ipv4-unicast {
+                admin-state enable
+            }
+            group ebgp {
+            }
+            neighbor ${IP1:=80.249.211.171} {
+                peer-as ${AS1:=50266}
+                peer-group ebgp
+            }
+         }
+        }
+        next-hop-groups group blackhole blackhole generate-icmp true
+        static-routes route 2.58.21.0/24 next-hop-group blackhole
+
+    #
+    # Oxidized server
+    #
+    oxidized:
+      mgmt-ipv4: 192.168.121.101
+      kind: linux
+      image: oxidized/oxidized:latest
+      binds:
+      # Map SR Linux Ruby source into container for latest updates
+      - ../lib/oxidized/model/srlinux.rb:/var/lib/gems/3.0.0/gems/oxidized-0.29.1/lib/oxidized/model/srlinux.rb
+      - ./clab-oxidized:/home/oxidized/.config/oxidized
+
+  # no links:
